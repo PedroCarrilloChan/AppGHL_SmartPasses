@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if page_title %}{{ page_title }} - {% endif %}Flask App
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Hero Section -->
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <i class="fas fa-flask fa-4x text-primary"></i>
+                </div>
+                <h1 class="display-4 fw-bold mb-3">
+                    {% if page_title %}{{ page_title }}{% else %}Welcome to Flask{% endif %}
+                </h1>
+                <p class="lead text-muted">
+                    {% if message %}
+                        {{ message }}
+                    {% else %}
+                        Your Flask application is ready for development. Start building something amazing!
+                    {% endif %}
+                </p>
+            </div>
+
+            {% if not page_title %}
+            <!-- Feature Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-rocket fa-2x text-primary mb-3"></i>
+                            <h5 class="card-title">Ready to Go</h5>
+                            <p class="card-text text-muted">
+                                Basic Flask structure with routing, templates, and static files configured.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-cogs fa-2x text-success mb-3"></i>
+                            <h5 class="card-title">Extensible</h5>
+                            <p class="card-text text-muted">
+                                Clean project structure designed for easy scaling and feature additions.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-palette fa-2x text-info mb-3"></i>
+                            <h5 class="card-title">Styled</h5>
+                            <p class="card-text text-muted">
+                                Bootstrap 5 with dark theme integration for modern, responsive design.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Getting Started Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">
+                        <i class="fas fa-code me-2"></i>Getting Started
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Project Structure</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-folder text-warning me-2"></i>templates/ - HTML templates</li>
+                                <li><i class="fas fa-folder text-warning me-2"></i>static/ - CSS, JS, images</li>
+                                <li><i class="fas fa-file-code text-info me-2"></i>app.py - Flask application</li>
+                                <li><i class="fas fa-file-code text-info me-2"></i>routes.py - URL routes</li>
+                                <li><i class="fas fa-file-code text-info me-2"></i>models.py - Database models</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Next Steps</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Add your routes in routes.py</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Create new templates</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Style with custom CSS</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Add database models</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Implement your features</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
