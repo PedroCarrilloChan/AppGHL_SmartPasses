@@ -1,28 +1,14 @@
+
 # main.py
-# Archivo principal que inicia el servidor y registra todas las rutas.
+# Archivo de compatibilidad para desarrollo local
 
-from flask import Flask
+from app import create_app
+import os
 
-# Importar los "Blueprints" de nuestros otros archivos
-from auth_handler import auth_bp
-from actions.customer import customer_actions_bp
-from actions.program import program_actions_bp
-from webhook_handler import webhook_bp # <-- NUEVA LÍNEA
-
-# Crear la aplicación principal de Flask
-app = Flask(__name__)
-
-# Registrar los Blueprints en la aplicación principal
-app.register_blueprint(auth_bp)
-app.register_blueprint(customer_actions_bp)
-app.register_blueprint(program_actions_bp)
-app.register_blueprint(webhook_bp) # <-- NUEVA LÍNEA
-
-# --- Endpoint de bienvenida ---
-@app.route('/')
-def index():
-    return "El servidor intermediario de Smart Passes para GHL está funcionando."
+# Crear la aplicación
+app = create_app()
 
 # --- Ejecutar el servidor ---
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=81)
+    # Para desarrollo local
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 81)), debug=True)

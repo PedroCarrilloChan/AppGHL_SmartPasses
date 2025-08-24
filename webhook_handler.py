@@ -1,15 +1,16 @@
+
 # webhook_handler.py
-# Maneja los webhooks entrantes de GoHighLevel.
+# Maneja las notificaciones de webhook que llegan de GoHighLevel.
 
 from flask import Blueprint, request, jsonify
-import hashlib
 import hmac
-import os
+import hashlib
 import json
+import os
 
-webhook_bp = Blueprint('webhook_handler', __name__)
+webhook_bp = Blueprint('webhook', __name__)
 
-@webhook_bp.route('/ghl/webhooks', methods=['POST'])
+@webhook_bp.route('/webhook/ghl', methods=['POST'])
 def handle_ghl_webhook():
     """
     Recibe, verifica y procesa las notificaciones de webhook de GHL.
@@ -42,18 +43,22 @@ def handle_ghl_webhook():
     print(f"📥 Webhook recibido de tipo: {event_type}")
     print(f"📋 Datos completos: {json.dumps(webhook_data, indent=2)}")
 
-    if event_type == 'ContactCreate':
-        # Aquí iría la lógica para crear automáticamente un cliente en Smart Passes.
-        # Por ahora, solo imprimimos un mensaje.
-        contact_email = webhook_data.get('email')
-        print(f"➡️ Lógica para 'ContactCreate' activada para el email: {contact_email}")
-        # Ejemplo: crear_cliente_en_smartpasses(webhook_data)
+    # Aquí puedes agregar lógica específica según el tipo de evento
+    # Por ejemplo:
+    # if event_type == 'contact.created':
+    #     handle_contact_created(webhook_data)
+    # elif event_type == 'contact.updated':
+    #     handle_contact_updated(webhook_data)
 
-    elif event_type == 'ContactDelete':
-        # Aquí iría la lógica para borrar el cliente en Smart Passes.
-        contact_id = webhook_data.get('id')
-        print(f"➡️ Lógica para 'ContactDelete' activada para el ID de contacto: {contact_id}")
-        # Ejemplo: borrar_cliente_en_smartpasses(contact_id)
+    # Por ahora, solo confirmamos que recibimos el webhook
+    return jsonify({"status": "received", "type": event_type}), 200
 
-    # Le respondemos a GHL con un 200 OK para decirle que recibimos la notificación.
-    return jsonify({"status": "success"}), 200
+def handle_contact_created(data):
+    """Maneja cuando se crea un nuevo contacto en GHL"""
+    print(f"🆕 Nuevo contacto creado: {data.get('contact', {}).get('email')}")
+    # Aquí puedes agregar lógica para crear automáticamente el cliente en SmartPasses
+
+def handle_contact_updated(data):
+    """Maneja cuando se actualiza un contacto en GHL"""
+    print(f"🔄 Contacto actualizado: {data.get('contact', {}).get('email')}")
+    # Aquí puedes agregar lógica para actualizar el cliente en SmartPasses
