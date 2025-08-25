@@ -9,7 +9,7 @@ auth_bp = Blueprint('auth', __name__)
 
 GHL_OAUTH_TOKEN_URL = "https://api.msgsndr.com/oauth/token"
 
-@auth_bp.route('/ghl/oauth/callback')
+@auth_bp.route('/oauth/callback')
 def ghl_oauth_callback():
     auth_code = request.args.get('code')
     if not auth_code:
