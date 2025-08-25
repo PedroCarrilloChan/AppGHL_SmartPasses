@@ -22,6 +22,11 @@ class Config:
     # Configuración del servidor
     HOST = os.environ.get('HOST', '0.0.0.0')
     PORT = int(os.environ.get('PORT', 5000))
+    
+    @staticmethod
+    def init_app(app):
+        """Método de inicialización base"""
+        pass
 
 class DevelopmentConfig(Config):
     """Configuración para desarrollo"""
