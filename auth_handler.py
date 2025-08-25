@@ -36,7 +36,100 @@ def ghl_oauth_callback():
         # En una app real, aquí guardarías los tokens en tu base de datos.
         # guardar_credenciales_en_db(token_data.get('locationId'), token_data.get('access_token'), token_data.get('refresh_token'))
 
-        return "¡Felicidades! Tu aplicación ha sido conectada exitosamente. Puedes cerrar esta ventana."
+        # --- SECCIÓN MODIFICADA ---
+        # Devolvemos una página HTML con el branding de Smart Passes y un botón de acción.
+        html_response = """
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Conexión Exitosa - Smart Passes</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+                body { 
+                    font-family: 'Poppins', sans-serif; 
+                    background-color: #0f172a; 
+                    color: #e2e8f0;
+                    display: flex; 
+                    justify-content: center; 
+                    align-items: center; 
+                    height: 100vh; 
+                    margin: 0; 
+                    text-align: center; 
+                }
+                .container { 
+                    background-color: #1e293b; 
+                    padding: 50px; 
+                    border-radius: 12px; 
+                    border: 1px solid #334155;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                    max-width: 500px;
+                }
+                .brand {
+                    font-weight: 600;
+                    font-size: 24px;
+                    color: #ffffff;
+                    margin-bottom: 20px;
+                }
+                h1 { 
+                    color: #22c55e; 
+                    font-size: 28px;
+                    margin-top: 0;
+                }
+                p { 
+                    color: #94a3b8; 
+                    font-size: 16px;
+                }
+                .next-step {
+                    border-top: 1px solid #334155;
+                    margin-top: 30px;
+                    padding-top: 30px;
+                }
+                .next-step h2 {
+                    font-size: 20px;
+                    color: #ffffff;
+                    margin-top: 0;
+                }
+                .button {
+                    display: inline-block;
+                    background-color: #2563eb;
+                    color: #ffffff;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    font-weight: 600;
+                    margin-top: 15px;
+                    transition: background-color 0.3s;
+                }
+                .button:hover {
+                    background-color: #1d4ed8;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="brand">SmartPasses</div>
+                <h1>✓ Conexión Exitosa</h1>
+                <p>Tu aplicación ha sido conectada correctamente.</p>
+
+                <div class="next-step">
+                    <h2>Siguientes Pasos</h2>
+                    <p>Para empezar a usar la aplicación, necesitas tus credenciales (App Key y Program ID). Haz clic en el botón para solicitarlas a nuestro equipo de soporte.</p>
+                    <a href="mailto:smartpasses@gmail.com?subject=Solicitud de Credenciales para App" class="button">Solicitar Credenciales</a>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return html_response
+
     except Exception as e:
         print(f"Error en el callback de OAuth: {e}")
-        return "Error al conectar la aplicación.", 500
+        # Página de error con el mismo estilo.
+        error_html = """
+        <!DOCTYPE html>
+        <html lang="es"><head><title>Error</title><style>body{font-family:'Poppins',sans-serif;background-color:#0f172a;color:#e2e8f0;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;text-align:center;}.container{background-color:#1e293b;padding:50px;border-radius:12px;border:1px solid #334155;}h1{color:#ef4444;}</style></head>
+        <body><div class="container"><h1>✕ Error de Conexión</h1><p>No se pudo completar la autenticación. Por favor, intenta de nuevo o contacta a soporte.</p></div></body></html>
+        """
+        return error_html, 500
