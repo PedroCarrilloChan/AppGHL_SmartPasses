@@ -40,11 +40,11 @@ def ghl_oauth_callback():
         # Devolvemos una página HTML con el branding de Smart Passes y un botón de acción.
         html_response = """
         <!DOCTYPE html>
-        <html lang="es">
+        <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Conexión Exitosa - Smart Passes</title>
+            <title>Connection Successful - Smart Passes</title>
             <style>
                 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
                 body { 
@@ -73,7 +73,7 @@ def ghl_oauth_callback():
                     margin-bottom: 20px;
                 }
                 h1 { 
-                    color: #22c55e; 
+                    color: #10b981; 
                     font-size: 28px;
                     margin-top: 0;
                 }
@@ -110,13 +110,13 @@ def ghl_oauth_callback():
         <body>
             <div class="container">
                 <div class="brand">SmartPasses</div>
-                <h1>✓ Conexión Exitosa</h1>
-                <p>Tu aplicación ha sido conectada correctamente.</p>
+                <h1>✓ Connection Successful</h1>
+                <p>Your application has been connected successfully.</p>
 
                 <div class="next-step">
-                    <h2>Siguientes Pasos</h2>
-                    <p>Para empezar a usar la aplicación, necesitas tus credenciales (App Key y Program ID). Haz clic en el botón para solicitarlas a nuestro equipo de soporte.</p>
-                    <a href="mailto:smartpasses@gmail.com?subject=Solicitud de Credenciales para App" class="button">Solicitar Credenciales</a>
+                    <h2>Next Steps</h2>
+                    <p>To start using the application, you need your credentials (App Key and Program ID). Click the button to request them from our support team.</p>
+                    <a href="mailto:support@smartpasses.com?subject=Credential Request for GoHighLevel&body=Hello, I need my API credentials to integrate SmartPasses with GoHighLevel. Please provide me with my App Key and Program ID." class="button">Request Credentials</a>
                 </div>
             </div>
         </body>
@@ -129,7 +129,7 @@ def ghl_oauth_callback():
         # Página de error con el mismo estilo.
         error_html = """
         <!DOCTYPE html>
-        <html lang="es"><head><title>Error</title><style>body{font-family:'Poppins',sans-serif;background-color:#0f172a;color:#e2e8f0;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;text-align:center;}.container{background-color:#1e293b;padding:50px;border-radius:12px;border:1px solid #334155;}h1{color:#ef4444;}</style></head>
-        <body><div class="container"><h1>✕ Error de Conexión</h1><p>No se pudo completar la autenticación. Por favor, intenta de nuevo o contacta a soporte.</p></div></body></html>
+        <html lang="en"><head><title>Error</title><style>body{font-family:'Poppins',sans-serif;background-color:#0f172a;color:#e2e8f0;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;text-align:center;}.container{background-color:#1e293b;padding:50px;border-radius:12px;border:1px solid #334155;}h1{color:#ef4444;}</style></head>
+        <body><div class="container"><h1>✕ Connection Error</h1><p>Authentication could not be completed. Please try again or contact support.</p></div></body></html>
         """
         return error_html, 500
