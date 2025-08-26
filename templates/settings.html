@@ -17,8 +17,14 @@
 <body class="bg-[#0f172a]">
     <div class="max-w-2xl mx-auto p-8 mt-10 bg-[#1e293b] rounded-lg shadow-2xl border border-gray-700">
         <div class="flex items-center mb-6">
-            <img src="https://walletclub.s3.us-east-1.amazonaws.com/Smart+Passe+logo+(512+x+512+px)+(1).png" alt="Smart Passes Logo" class="h-12 w-12 mr-4 rounded-md">
+            <img src="https://i.ibb.co/9vVz9q9/Smart-Passe-logo-512-x-512-px.jpg" alt="Smart Passes Logo" class="h-12 w-12 mr-4 rounded-md">
             <h1 class="text-2xl font-bold text-white">Smart Passes Configuration</h1>
+        </div>
+
+        <!-- LÍNEA DE DEPURACIÓN -->
+        <div class="bg-yellow-200 text-yellow-800 p-3 rounded-md mb-6 text-xs">
+            <strong>Debugging Info:</strong><br>
+            Current URL: <span id="debugUrl"></span>
         </div>
 
         <p class="text-gray-400 mb-8">
@@ -51,6 +57,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('settingsForm');
             const messageDiv = document.getElementById('message');
+
+            // LÍNEA DE DEPURACIÓN
+            document.getElementById('debugUrl').textContent = window.location.href;
 
             const urlParams = new URLSearchParams(window.location.search);
             const locationId = urlParams.get('locationId');
