@@ -1,11 +1,10 @@
 # actions/customer.py
-# Contiene la lógica para todas las acciones de GHL relacionadas con los clientes.
+# Versión corregida que maneja la estructura de datos anidada de GoHighLevel en TODAS las funciones.
 
 from flask import Blueprint, request, jsonify
 import requests
 import os
 import json
-# Importamos la base de datos simulada desde el otro archivo
 from settings_handler import credentials_db
 
 customer_actions_bp = Blueprint('customer_actions', __name__)
@@ -23,7 +22,7 @@ def get_agency_credentials(ghl_data):
 
     agency_credentials = credentials_db.get(location_id)
     if not agency_credentials:
-        return None, {"error": "La aplicación no ha sido configurada. Por favor, guarde sus credenciales en la página de configuración de la app."}, 400
+        return None, {"error": "La aplicación no ha sido configurada. Por favor, guarde sus credenciales."}, 400
 
     return agency_credentials, None, None
 
@@ -36,37 +35,32 @@ def handle_create_customer():
     if error_response:
         return jsonify(error_response), status_code
 
+    inputs = ghl_data.get('inputs', {})
+
     smartpasses_api_key = agency_credentials.get('smartpasses_api_key')
-    program_id = ghl_data.get('program_id') or agency_credentials.get('default_program_id')
-    email = ghl_data.get('contact_email')
+    program_id = inputs.get('program_id') or agency_credentials.get('default_program_id')
+    email = inputs.get('contact_email')
 
     if not program_id or not email:
         return jsonify({"error": "El Program ID y el Email son obligatorios."}), 400
 
     create_url = f"{SMARTPASSES_API_BASE_URL}/programs/{program_id}/customers"
     payload = {
-        "firstName": ghl_data.get('contact_first_name'),
-        "lastName": ghl_data.get('contact_last_name'),
+        "firstName": inputs.get('contact_first_name'),
+        "lastName": inputs.get('contact_last_name'),
         "email": email,
-        "phone": ghl_data.get('contact_phone')
+        "phone": inputs.get('contact_phone')
     }
-    headers = {
-        "Authorization": smartpasses_api_key,
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": smartpasses_api_key, "Content-Type": "application/json"}
 
     try:
         response = requests.post(create_url, json=payload, headers=headers)
         response.raise_for_status()
-        smartpasses_response = response.json()
-        return jsonify(smartpasses_response), 200
+        return jsonify(response.json()), 200
     except requests.exceptions.HTTPError as err:
-        return jsonify({
-            "error": "Fallo en la comunicación con la API de Smart Passes", 
-            "details": err.response.text
-        }), err.response.status_code
+        return jsonify({"error": "Fallo en la API de Smart Passes", "details": err.response.text}), err.response.status_code
     except Exception as e:
-        return jsonify({"error": "Ocurrió un error interno en el servidor."}), 500
+        return jsonify({"error": "Error interno del servidor."}), 500
 
 @customer_actions_bp.route('/actions/add_points', methods=['POST'])
 def handle_add_points():
@@ -77,10 +71,12 @@ def handle_add_points():
     if error_response:
         return jsonify(error_response), status_code
 
+    inputs = ghl_data.get('inputs', {})
+
     smartpasses_api_key = agency_credentials.get('smartpasses_api_key')
-    program_id = ghl_data.get('program_id') or agency_credentials.get('default_program_id')
-    customer_id = ghl_data.get('customer_id')
-    points_to_add = ghl_data.get('points_to_add')
+    program_id = inputs.get('program_id') or agency_credentials.get('default_program_id')
+    customer_id = inputs.get('customer_id')
+    points_to_add = inputs.get('points_to_add')
 
     if not all([program_id, customer_id, points_to_add]):
         return jsonify({"error": "Program ID, Customer ID, y Points to Add son obligatorios."}), 400
@@ -92,12 +88,11 @@ def handle_add_points():
     try:
         response = requests.post(add_points_url, json=payload, headers=headers)
         response.raise_for_status()
-        smartpasses_response = response.json()
-        return jsonify(smartpasses_response), 200
+        return jsonify(response.json()), 200
     except requests.exceptions.HTTPError as err:
         return jsonify({"error": "Fallo al añadir puntos", "details": err.response.text}), err.response.status_code
     except Exception as e:
-        return jsonify({"error": "Ocurrió un error interno en el servidor."}), 500
+        return jsonify({"error": "Error interno del servidor."}), 500
 
 @customer_actions_bp.route('/actions/get_customer', methods=['POST'])
 def handle_get_customer():
@@ -108,9 +103,11 @@ def handle_get_customer():
     if error_response:
         return jsonify(error_response), status_code
 
+    inputs = ghl_data.get('inputs', {})
+
     smartpasses_api_key = agency_credentials.get('smartpasses_api_key')
-    program_id = ghl_data.get('program_id') or agency_credentials.get('default_program_id')
-    customer_id = ghl_data.get('customer_id')
+    program_id = inputs.get('program_id') or agency_credentials.get('default_program_id')
+    customer_id = inputs.get('customer_id')
 
     if not all([program_id, customer_id]):
         return jsonify({"error": "Program ID y Customer ID son obligatorios."}), 400
@@ -121,12 +118,11 @@ def handle_get_customer():
     try:
         response = requests.get(get_customer_url, headers=headers)
         response.raise_for_status()
-        smartpasses_response = response.json()
-        return jsonify(smartpasses_response), 200
+        return jsonify(response.json()), 200
     except requests.exceptions.HTTPError as err:
         return jsonify({"error": "Fallo al obtener el cliente", "details": err.response.text}), err.response.status_code
     except Exception as e:
-        return jsonify({"error": "Ocurrió un error interno en el servidor."}), 500
+        return jsonify({"error": "Error interno del servidor."}), 500
 
 @customer_actions_bp.route('/actions/update_customer', methods=['POST'])
 def handle_update_customer():
@@ -137,19 +133,21 @@ def handle_update_customer():
     if error_response:
         return jsonify(error_response), status_code
 
+    inputs = ghl_data.get('inputs', {})
+
     smartpasses_api_key = agency_credentials.get('smartpasses_api_key')
-    program_id = ghl_data.get('program_id') or agency_credentials.get('default_program_id')
-    customer_id = ghl_data.get('customer_id')
+    program_id = inputs.get('program_id') or agency_credentials.get('default_program_id')
+    customer_id = inputs.get('customer_id')
 
     if not all([program_id, customer_id]):
         return jsonify({"error": "Program ID y Customer ID son obligatorios."}), 400
 
     payload = {}
-    if ghl_data.get('first_name'): payload['firstName'] = ghl_data.get('first_name')
-    if ghl_data.get('last_name'): payload['lastName'] = ghl_data.get('last_name')
-    if ghl_data.get('email'): payload['email'] = ghl_data.get('email')
-    if ghl_data.get('phone'): payload['phone'] = ghl_data.get('phone')
-    if ghl_data.get('points') is not None: payload['points'] = int(ghl_data.get('points'))
+    if inputs.get('first_name'): payload['firstName'] = inputs.get('first_name')
+    if inputs.get('last_name'): payload['lastName'] = inputs.get('last_name')
+    if inputs.get('email'): payload['email'] = inputs.get('email')
+    if inputs.get('phone'): payload['phone'] = inputs.get('phone')
+    if inputs.get('points') is not None: payload['points'] = int(inputs.get('points'))
 
     if not payload:
         return jsonify({"error": "Debes proporcionar al menos un campo para actualizar."}), 400
@@ -160,12 +158,11 @@ def handle_update_customer():
     try:
         response = requests.put(update_customer_url, json=payload, headers=headers)
         response.raise_for_status()
-        smartpasses_response = response.json()
-        return jsonify(smartpasses_response), 200
+        return jsonify(response.json()), 200
     except requests.exceptions.HTTPError as err:
         return jsonify({"error": "Fallo al actualizar el cliente", "details": err.response.text}), err.response.status_code
     except Exception as e:
-        return jsonify({"error": "Ocurrió un error interno en el servidor."}), 500
+        return jsonify({"error": "Error interno del servidor."}), 500
 
 @customer_actions_bp.route('/actions/delete_customer', methods=['POST'])
 def handle_delete_customer():
@@ -176,9 +173,11 @@ def handle_delete_customer():
     if error_response:
         return jsonify(error_response), status_code
 
+    inputs = ghl_data.get('inputs', {})
+
     smartpasses_api_key = agency_credentials.get('smartpasses_api_key')
-    program_id = ghl_data.get('program_id') or agency_credentials.get('default_program_id')
-    customer_id = ghl_data.get('customer_id')
+    program_id = inputs.get('program_id') or agency_credentials.get('default_program_id')
+    customer_id = inputs.get('customer_id')
 
     if not all([program_id, customer_id]):
         return jsonify({"error": "Program ID y Customer ID son obligatorios."}), 400
@@ -193,4 +192,4 @@ def handle_delete_customer():
     except requests.exceptions.HTTPError as err:
         return jsonify({"error": "Fallo al borrar el cliente", "details": err.response.text}), err.response.status_code
     except Exception as e:
-        return jsonify({"error": "Ocurrió un error interno en el servidor."}), 500
+        return jsonify({"error": "Error interno del servidor."}), 500
