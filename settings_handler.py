@@ -5,20 +5,15 @@ from flask import Blueprint, request, jsonify, render_template
 
 settings_bp = Blueprint('settings_handler', __name__)
 
-# Simulación de una base de datos.
+# Simulación de una base de datos. La hacemos accesible globalmente.
+# En una app real, esto sería una conexión a una base de datos real (PostgreSQL, MongoDB, etc.).
 credentials_db = {}
 
 @settings_bp.route('/settings')
 def settings_page():
     """Muestra la página de configuración a la agencia."""
-    # 1. Obtener locationId de los parámetros de la URL que envía GHL
     location_id = request.args.get('locationId')
-
-    # Debug: Imprimir para ver qué llega
     print(f"DEBUG: locationId recibido en la URL: {location_id}")
-
-    # 2. Pasar el locationId al template HTML
-    # La plantilla 'settings.html' ahora podrá acceder a esta variable.
     return render_template('settings.html', location_id=location_id)
 
 @settings_bp.route('/settings/save', methods=['POST'])
@@ -29,8 +24,6 @@ def save_settings():
     api_key = data.get('apiKey')
     program_id = data.get('programId')
 
-    print(f"DEBUG: Datos recibidos para guardar: {data}")
-
     if not all([location_id, api_key, program_id]):
         return jsonify({"error": "Missing required fields."}), 400
 
@@ -40,4 +33,5 @@ def save_settings():
     }
 
     print(f"--- CREDENCIALES GUARDADAS PARA {location_id} ---")
+    print(f"Datos: {credentials_db[location_id]}")
     return jsonify({"status": "success"}), 200
