@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Passes Configuration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a]">
+    <div class="max-w-2xl mx-auto p-8 mt-10 bg-[#1e293b] rounded-lg shadow-2xl border border-gray-700">
+        <div class="flex items-center mb-6">
+            <img src="https://i.ibb.co/9vVz9q9/Smart-Passe-logo-512-x-512-px.jpg" alt="Smart Passes Logo" class="h-12 w-12 mr-4 rounded-md">
+            <h1 class="text-2xl font-bold text-white">Smart Passes Configuration</h1>
+        </div>
+
+        <p class="text-gray-400 mb-8">
+            Please enter your Smart Passes API credentials below. You can find these in your Smart Passes account dashboard.
+        </p>
+
+        <form id="settingsForm" class="space-y-6">
+            <div>
+                <label for="apiKey" class="block text-sm font-medium text-gray-300">Smart Passes App Key</label>
+                <input type="password" id="apiKey" name="apiKey" required class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+
+            <div>
+                <label for="programId" class="block text-sm font-medium text-gray-300">Default Program ID</label>
+                <input type="text" id="programId" name="programId" required class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+
+            <input type="hidden" id="locationId" name="locationId">
+
+            <div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                    Save Configuration
+                </button>
+            </div>
+        </form>
+        <div id="message" class="mt-6 text-center h-5"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('settingsForm');
+            const messageDiv = document.getElementById('message');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const locationId = urlParams.get('locationId');
+
+            if (locationId) {
+                document.getElementById('locationId').value = locationId;
+            } else {
+                messageDiv.textContent = 'Error: Location ID not found. Please access this page from your GoHighLevel account.';
+                messageDiv.className = 'text-red-400';
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                messageDiv.textContent = 'Saving...';
+                messageDiv.className = 'text-gray-400';
+
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch('/settings/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    });
+
+                    if (response.ok) {
+                        messageDiv.textContent = 'Configuration saved successfully!';
+                        messageDiv.className = 'text-green-400 font-semibold';
+                    } else {
+                        const errorData = await response.json();
+                        messageDiv.textContent = `Error: ${errorData.error || 'Could not save settings.'}`;
+                        messageDiv.className = 'text-red-400';
+                    }
+                } catch (error) {
+                    messageDiv.textContent = 'A network error occurred. Please try again.';
+                    messageDiv.className = 'text-red-400';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
