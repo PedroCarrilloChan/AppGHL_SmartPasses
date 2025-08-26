@@ -5,6 +5,14 @@ from flask import Blueprint, request, jsonify, render_template
 
 settings_bp = Blueprint('settings_handler', __name__)
 
+# --- RUTA DE PRUEBA AÑADIDA ---
+# Esta ruta simple nos ayudará a confirmar si el blueprint se registra correctamente.
+@settings_bp.route('/')
+def test_route():
+    return "El Blueprint de Settings está funcionando!"
+# ------------------------------------
+
+
 # Simulación de una base de datos. En una app real, usarías una base de datos real.
 credentials_db = {}
 
