@@ -1,5 +1,5 @@
 # auth_handler.py
-# Maneja el flujo de autenticación OAuth 2.0 para GoHighLevel.
+# Maneja el flujo de autenticación OAuth 2.0 para GoHighLevel
 
 from flask import Blueprint, request
 import requests

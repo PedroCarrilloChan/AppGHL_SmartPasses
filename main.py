@@ -9,8 +9,7 @@ from actions.customer import customer_actions_bp
 from actions.program import program_actions_bp
 from actions.offer import offer_actions_bp
 from webhook_handler import webhook_bp
-from settings_handler import settings_bp # <-- NUEVA LÍNEA
-
+from settings_handler import settings_bp # 
 # Crear la aplicación principal de Flask
 app = Flask(__name__)
 
