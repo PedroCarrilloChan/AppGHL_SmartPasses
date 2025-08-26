@@ -9,9 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
+        body { font-family: 'Poppins', sans-serif; }
     </style>
 </head>
 <body class="bg-[#0f172a]">
@@ -19,12 +17,6 @@
         <div class="flex items-center mb-6">
             <img src="https://i.ibb.co/9vVz9q9/Smart-Passe-logo-512-x-512-px.jpg" alt="Smart Passes Logo" class="h-12 w-12 mr-4 rounded-md">
             <h1 class="text-2xl font-bold text-white">Smart Passes Configuration</h1>
-        </div>
-
-        <!-- LÍNEA DE DEPURACIÓN -->
-        <div class="bg-yellow-200 text-yellow-800 p-3 rounded-md mb-6 text-xs">
-            <strong>Debugging Info:</strong><br>
-            Current URL: <span id="debugUrl"></span>
         </div>
 
         <p class="text-gray-400 mb-8">
@@ -42,7 +34,8 @@
                 <input type="text" id="programId" name="programId" required class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             </div>
 
-            <input type="hidden" id="locationId" name="locationId">
+            <!-- CAMBIO CLAVE: El valor ahora se inserta desde el servidor con Jinja2 -->
+            <input type="hidden" id="locationId" name="locationId" value="{{ location_id }}">
 
             <div>
                 <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
@@ -57,16 +50,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('settingsForm');
             const messageDiv = document.getElementById('message');
+            const locationIdInput = document.getElementById('locationId');
 
-            // LÍNEA DE DEPURAC
-            document.getElementById('debugUrl').textContent = window.location.href;
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const locationId = urlParams.get('locationId');
-
-            if (locationId) {
-                document.getElementById('locationId').value = locationId;
-            } else {
+            // CAMBIO CLAVE: Ya no buscamos en la URL, solo verificamos si el campo tiene valor.
+            if (!locationIdInput.value) {
                 messageDiv.textContent = 'Error: Location ID not found. Please access this page from your GoHighLevel account.';
                 messageDiv.className = 'text-red-400';
             }
@@ -82,9 +69,7 @@
                 try {
                     const response = await fetch('/settings/save', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data),
                     });
 

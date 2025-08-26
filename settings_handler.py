@@ -5,21 +5,21 @@ from flask import Blueprint, request, jsonify, render_template
 
 settings_bp = Blueprint('settings_handler', __name__)
 
-# --- RUTA DE PRUEBA AÑADIDA ---
-# Esta ruta simple nos ayudará a confirmar si el blueprint se registra correctamente.
-@settings_bp.route('/')
-def test_route():
-    return "El Blueprint de Settings está funcionando!"
-# ------------------------------------
-
-
-# Simulación de una base de datos. En una app real, usarías una base de datos real.
+# Simulación de una base de datos.
 credentials_db = {}
 
 @settings_bp.route('/settings')
 def settings_page():
     """Muestra la página de configuración a la agencia."""
-    return render_template('settings.html')
+    # 1. Obtener locationId de los parámetros de la URL que envía GHL
+    location_id = request.args.get('locationId')
+
+    # Debug: Imprimir para ver qué llega
+    print(f"DEBUG: locationId recibido en la URL: {location_id}")
+
+    # 2. Pasar el locationId al template HTML
+    # La plantilla 'settings.html' ahora podrá acceder a esta variable.
+    return render_template('settings.html', location_id=location_id)
 
 @settings_bp.route('/settings/save', methods=['POST'])
 def save_settings():
@@ -29,18 +29,15 @@ def save_settings():
     api_key = data.get('apiKey')
     program_id = data.get('programId')
 
+    print(f"DEBUG: Datos recibidos para guardar: {data}")
+
     if not all([location_id, api_key, program_id]):
         return jsonify({"error": "Missing required fields."}), 400
 
-    # Guardamos las credenciales asociadas al ID de la sub-cuenta
     credentials_db[location_id] = {
         "smartpasses_api_key": api_key,
         "default_program_id": program_id
     }
 
-    print("--- CREDENCIALES GUARDADAS ---")
-    print(f"Location ID: {location_id}")
-    print(f"Datos Guardados: {credentials_db[location_id]}")
-    print("----------------------------")
-
+    print(f"--- CREDENCIALES GUARDADAS PARA {location_id} ---")
     return jsonify({"status": "success"}), 200
