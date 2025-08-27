@@ -35,6 +35,7 @@ def handle_create_customer():
     if error_response:
         return jsonify(error_response), status_code
 
+    # --- CAMBIO CLAVE: Acceder a los datos dentro del objeto 'inputs' ---
     inputs = ghl_data.get('inputs', {})
 
     smartpasses_api_key = agency_credentials.get('smartpasses_api_key')
