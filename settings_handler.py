@@ -3,15 +3,10 @@ import requests
 import json
 from flask import Blueprint, request, jsonify, render_template
 
-# -----------------------------------------------------------------------------
-# PASO 1: CREAR EL BLUEPRINT (LA CAJA DE HERRAMIENTAS)
-# -----------------------------------------------------------------------------
-# Esta línea DEBE estar antes de cualquier @settings_bp.route
+# PASO 1: Se crea el Blueprint ANTES de usarlo. Esto corrige el 'NameError'.
 settings_bp = Blueprint('settings', __name__)
 
-# -----------------------------------------------------------------------------
-# FUNCIÓN AUXILIAR PARA COMUNICARSE CON CLOUDFLARE D1
-# -----------------------------------------------------------------------------
+# Función auxiliar para comunicarse con la base de datos de Cloudflare D1
 def query_d1(sql, params=[]):
     """
     Ejecuta una consulta SQL en la base de datos D1 a través de la API de Cloudflare.
@@ -36,18 +31,15 @@ def query_d1(sql, params=[]):
         print(f"Error en la API de D1: {err.response.text}")
         return None, (err.response.text, err.response.status_code)
 
-# -----------------------------------------------------------------------------
-# PASO 2: USAR EL BLUEPRINT PARA DEFINIR LAS RUTAS
-# -----------------------------------------------------------------------------
+# PASO 2: Se definen las rutas usando el Blueprint ya creado.
 @settings_bp.route('/settings', methods=['GET'])
 def settings_page():
     """
     Muestra la página de configuración (settings.html).
     """
     location_id = request.args.get('locationId')
-    print(f"DEBUG: locationId recibido en la URL: {location_id}") # Mensaje de depuración
+    print(f"DEBUG: locationId recibido en la URL: {location_id}")
     if not location_id:
-        # Aunque GHL no lo envíe, no queremos que la app falle, solo que el campo esté vacío.
         location_id = "" 
     return render_template('settings.html', location_id=location_id)
 
@@ -69,7 +61,21 @@ def save_settings():
     if not all([api_key, program_id]):
         return jsonify({"error": "Faltan campos obligatorios (API Key o Program ID)."}), 400
 
-    print(f"--- Guardando credenciales para {location_id} ---") # Mensaje de depuración
-    print(f"Datos: {data}") # Mensaje de depuración
+    print(f"--- Guardando credenciales para {location_id} ---")
+    print(f"Datos: {data}")
 
-    sql = "INSERT OR REPLACE INTO sub_account_credentials (location
+    # Se usan comillas triples para la consulta SQL. Esto corrige el 'SyntaxError'.
+    sql = """
+    INSERT OR REPLACE INTO sub_account_credentials (location_id, api_key, program_id) 
+    VALUES (?, ?, ?);
+    """
+    params = [location_id, api_key, program_id]
+
+    result, error = query_d1(sql, params)
+
+    if error:
+        print(f"🚨 ERROR al guardar en D1: {error[0]}")
+        return jsonify({"error": "No se pudieron guardar las credenciales en la base de datos."}), error[1]
+
+    print(f"✅ Credenciales guardadas en Cloudflare D1 para Location ID: {location_id}")
+    return jsonify({"status": "success", "message": "Configuración guardada exitosamente."}), 200
